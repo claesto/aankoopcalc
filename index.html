@@ -50,6 +50,15 @@
 								class="px-8 w-full border rounded py-2 text-gray-700 focus:outline-none items-center"
 							/>
 						</div>
+						<div class="flex">
+							<div class="flex items-center h-5">
+								<input id="wageCookieCheckbox" aria-describedby="helper-checkbox-text" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+							</div>
+							<div class="ms-2 text-sm">
+								<label for="helper-checkbox" class="font-medium text-gray-900 dark:text-gray-300">Loon onthouden?</label>
+								<p id="helper-checkbox-text" class="text-xs font-normal text-gray-500 dark:text-gray-300">Gebruik cookies om het loon automatisch in te vullen.</p>
+							</div>
+						</div>
 					</div>
 					<div class="w-full mb-2">
 						<label
@@ -112,6 +121,7 @@
 		</div>
 
 		<script>
+			// @TODO: check checkbox if cookie exists
 			function hoursToWorkingDays(hoursToWork, workingHoursInput) {
 				var workingDays = Math.ceil(hoursToWork / workingHoursInput);
 
@@ -128,6 +138,24 @@
 
                 return Math.round(wageInput / (workingHoursInput * workingDaysPerWeek * averageWeeksPerMonth));
             }
+
+			function setCookie(wageInput) {
+				var date = new Date();
+				
+				date.setTime(date.getTime() + (365*24*60*60*1000));
+        		expires = "; expires=" + date.toUTCString();
+
+				document.cookie = "aankoopCalc_wage=" + wageInput + expires + "; SameSite=Lax; Secure";
+			}
+
+			function clearCookie() {
+				document.cookie = "aankoopCalc_wage=;Max-Age=-99999999;"
+			}
+
+			function checkCookieCheckboxChecked() {
+				var rememberWage = document.getElementById("wageCookieCheckbox");
+				return rememberWage.checked;
+			}
 
 			function calculateFire() {
 				var wageInput = document.getElementById("wageInput").value,
@@ -155,6 +183,12 @@
 
 				document.getElementById("result").innerHTML = result; // show result
 				document.getElementById("resultsPanel").style.visibility = "visible"; // make results panel visible
+
+				if (checkCookieCheckboxChecked()) {
+					setCookie(wageInput);
+				} else {
+					clearCookie();
+				}
 			}
 		</script>
 	</body>
